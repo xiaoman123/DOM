@@ -1,0 +1,1057 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>DOM</title>
+<link type="text/css" rel="stylesheet" href="style/base.css" />
+</head>
+<body class="pd10">
+<h1><img src="images/ma.gif"/> DOM概述</h1>
+<p>DOM是文档对象模型（Document Object Model）的简称，它的基本思想是把<span class="fb">结构化文档</span>（比如HTML和XML）解析成一系列的<span class="fb">节点</span>，再由这些节点组成一个<span class="fb">树状结构</span>。所有的节点和最终的树状结构，都有规范的<span class="fb">对外接口</span>，以达到使用编程语言操作文档的目的（增删改）。所以，DOM可以理解成<span class="fb unl">文档的编程接口（API）</span>。<br/></p>
+<p>本章介绍的就是JavaScript对DOM标准的实现和用法。</p>
+<h4>文档：DOM中的"D"：</h4>
+<p>如果没有document（文档），DOM也就无从谈起。<br/>创建一个网页——>加载到Web浏览器中——>DOM就在幕后悄然而生。它把你编写的网页文档转换为一个文档对象。</p>
+<h4>对象：DOM中的"O"：</h4>
+<p>document对象的主要功能就是处理网页内容。</p>
+<h4>模型：DOM中的"M"：</h4>
+<p>DOM把文档表示成一颗节点树（模型）。</p>
+<xmp class="eg"><!DOCTYPE html>
+<html>
+    <head>
+    	<meta charset="utf-8" />
+    	<title>list</title>	
+    </head>
+    <body>
+        <h1 class="title">What to buy</h1>
+        <p>Don't forget!</p>
+        <ul>
+            <li>beans</li>
+            <li>cheese</li>
+            <li>Milk</li>
+        </ul>
+    </body>
+</html>
+</xmp>
+<div class="demo">
+    <iframe src="0-1.html" width="100%" height="100%" scrolling="no" frameborder="0" border="0" allowTransparency="true" ></iframe>
+</div>
+<img src="images/0-1.png" />
+<h2>1.Node节点对象</h2>
+<p>DOM的最小单位是节点（node）。文档是由节点构成的集合。</p>
+<h4>节点的类型：</h4>
+<p>在DOM里有许多不同类型的节点，很多类型的DOM节点包含着其他类型的节点。</p>
+<table>
+    <thead>
+        <tr>
+            <th>节点</th>
+            <th>节点类型</th>
+            <th>代表</th>
+            <th>eg</th>
+            <th>nodeType</th>
+            <th>nodeName</th>
+            <th>nodeValue</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><span class="blue">DOCUMENT_NODE</span></td>
+            <td>文档节点</td>
+            <td>整个文档</td>
+            <td>window.document</td>
+            <td>9</td>
+            <td>#document</td>
+            <td>null</td>
+        </tr>
+        <tr>
+            <td><span class="blue">ELEMENT_NODE</span></td>
+            <td>元素节点</td>
+            <td>HTML元素</td>
+            <td>&lt;body&gt;、&lt;ul&gt;</td>
+            <td>1</td>
+            <td>大写的HTML元素名</td>
+            <td>null</td>
+        </tr>
+        <tr>
+            <td><span class="blue">ATTRIBUTE_NODE</span></td>
+            <td>属性节点</td>
+            <td>HTML元素的属性</td>
+            <td>class=”title”</td>
+            <td>2</td>
+            <td>等同于Attr.name</td>
+            <td>属性值</td>
+        </tr>
+        <tr>
+            <td><span class="blue">TEXT_NODE</span></td>
+            <td>文本节点</td>
+            <td>HTML文档中出现的文本</td>
+            <td>What to buy</td>
+            <td>3</td>
+            <td>#text</td>
+            <td>文本内容</td>
+        </tr>
+        <tr>
+            <td>DOCUMENT_FRAGMENT_NODE</td>
+            <td>文档碎片节点</td>
+            <td>文档的片段</td>
+            <td></td>
+            <td>11</td>
+            <td>#document-fragment</td>
+            <td>null</td>
+        </tr>
+        <tr>
+            <td>DOCUMENT_TYPE_NODE</td>
+            <td>文档类型节点</td>
+            <td>文档的类型</td>
+            <td>&lt;!DOCTYPE html&gt;</td>
+            <td>10</td>
+            <td>等同于DocumentType.name</td>
+            <td>null</td>
+        </tr>
+    </tbody>
+</table>
+<p>浏览器原生提供一个Node对象，上面所有类型的节点都是<span class="fb">Node对象派生出来</span>的，也就是说它们都<span class="fb">继承</span>了Node的属性和方法。</p>
+<h3>1.1  Node对象的属性</h3>
+<ul>
+    <li><span class="blue">nodeType</span>——节点的常量值——用于表明节点类型</li>
+    <li><span class="blue">nodeName</span>——节点的名称</li>
+    <li><span class="blue">nodeValue</span>——节点的值</li>
+    <li><span class="blue">childNodes</span>——返回父节点的所有子节点</li>
+    <li><span class="blue">children</span>——返回父元素HTML元素类型的子节点</li>
+    <li>firstChild——第一个子节点。</li>
+    <li>lastChild——最后一个子节点。</li>
+    <li>nextSibling——下一个同级节点。</li>
+    <li>parentNode——父节点。</li>
+    <li>previousSibling——上一个同级节点。</li>
+    <li>firstElementChild——第一个类型为HTML元素的子节点。</li>
+    <li>lastElementChild——最后一个类型为HTML元素的子节点。</li>
+    <li>nextElementSibling——下一个类型为HTML元素的同级节点。</li>
+    <li>previousElementSibling——上一个类型为HTML元素的同级节点。</li>
+</ul>
+<h4>（1）nodeName属性和nodeType属性</h4>
+<p>通常来说，使用nodeType属性确定一个节点的类型，比较方便。</p>
+<h4>（2）nodeValue属性</h4>
+<p>该属性的作用主要是提取文本节点的内容。</p>
+<h4>（3）childNodes属性和children属性</h4>
+<table>
+    <thead>
+        <tr>
+            <th>属性</th>
+            <th>返回</th>
+            <th>返回对象的成员</th>
+            <th>空</th>
+            <tn>tips</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>childNodes</td>
+            <td>一个NodeList对象</td>
+            <td>父节点的所有子节点</td>
+            <td>父对象不包括任何子对象,返回一个空对象</td>
+            <td rowspan="2">childNodes属性和children属性返回的节点都是动态的。<br/>一旦原节点发生变化，立刻会反映在返回结果之中。</td>
+        </tr>
+        <tr>
+            <td>children</td>
+            <td>一个类似数组的对象</td>
+            <td>HTML元素类型的子节点</td>
+            <td>没有HTML元素类型的子节点,返回一个空数组</td>
+        </tr>
+    </tbody>
+</table>
+<p>*NodeList是一种类似数组的对象，用于保存一组有序的节点，可通过位置访问，有length属性。</p>
+<h3>1.2  Node对象的方法</h3>
+<table>
+    <thead>
+        <tr>
+            <th>方法</th>
+            <th></th>
+            <th>参数</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>appendChild()</td>
+            <td>在父节点的结尾插入子节点</td>
+            <td>元素节点、子节点</td>
+            <td>parentNode.appendChild(childNode)</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>insertBefore()</td>
+            <td>在父节点的指定位置插入子节点</td>
+            <td>接受两个参数，<br/>第一个参数是所要插入的子节点，<br/>第二个参数是父节点下方的另一个子节点，<br/>新插入的子节点将插在这个节点的前面。</td>
+            <td>parentNode.appendChild(childNode1,childNode2)</td>
+        </tr>
+        <tr>
+            <td>removeChild()</td>
+            <td>从父节点移除一个子节点</td>
+            <td>子节点</td>
+            <td>parentNode.removeChild(childNode)</td>
+        </tr>
+        <tr>
+            <td>replaceChild（）</td>
+            <td>将一个新的节点，替换父节点的某一个子节点</td>
+            <td>它接受两个参数，<br/>第一个参数是用来替换的新节点，<br/>第二个参数将要被替换走的子节点。</td>
+            <td>parentNode.replaceChild(childNode1,childNode2);</td>
+        </tr>
+        <tr>
+            <td>cloneNode()</td>
+            <td>克隆一个节点</td>
+            <td>布尔值</td>
+            <td>Node.cloneNode(true)</td>
+        </tr>
+        <tr>
+            <td>hasChildNodes()</td>
+            <td>判定一个节点是否有子节点</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>contains()</td>
+            <td>检查一个节点是否为另一个节点的子节点</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>isEqualNode</td>
+            <td>检查两个节点是否相等</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>compareDocumentPosition()</td>
+            <td>对比两个节点的文档位置</td>
+            <td></td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+<h3>1.3　NodeList对象</h3>
+<p>当使用querySelectorAll()方法选择一组对象时，会返回一个NodeList对象（比如document.querySelectorAll('*')的返回结果）或者HTMLCollection对象（比如document.scripts）。它们是类似数组的对象，即可以使用length属性，但是不能使用pop或push之类数组特有的方法。</p>
+<h2>2. document对象</h2>
+<p>document对象是文档的根节点，window.document属性就指向这个对象。也就是说，只要浏览器开始载入HTML文档，这个对象就开始存在了，可以直接调用。</p>
+<img src="images/0-2.png" />
+<h3>2.1　document对象的属性</h3>
+<table>
+    <thead>
+        <tr>
+            <th>分类</th>
+            <th>属性</th>
+            <th>释义</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="5">（1）提供文档信息的属性</td>
+            <td class="blue">title</td>
+            <td>文档的标题</td>
+            <td rowspan="5"><xmp class="js">document.title
+document.URL
+document.lastModified
+document.referrer
+document.compatMode
+</xmp></td>
+        </tr>
+        <tr>
+            <td class="blue">URL</td>
+            <td>文档的URL</td>
+        </tr>
+        <tr>
+            <td>lastModified</td>
+            <td>文档文件的上一次修改时间</td>
+        </tr>
+        <tr>
+            <td><a href="0-2.html" target="_blank">referrer</a></td>
+            <td>文档的访问来源<br/>当前网页的超链接所在网页的URL</td>
+        </tr>
+        <tr>
+            <td>compatMode</td>
+            <td>浏览器处理文档的模式</td>
+        </tr>
+        <tr>
+            <td rowspan="6">（2）指向其他节点或对象的属性</td>
+            <td class="blue">doctype</td>
+            <td>指向文档类型节点</td>
+            <td rowspan="6"><xmp class="js">document.doctype //<!DOCTYPE html>
+document.documentElement //<html>...</html> 
+document.head //<head>...</head>
+document.body //<body>...</body>
+document.activeElement
+document.defaultView //window
+document.implementation
+</xmp></td>
+        </tr>
+        <tr>
+            <td class="blue">documentElement</td>
+            <td>指向html元素节点</td>
+        </tr>
+        <tr>
+            <td>head</td>
+            <td>指向文档的head元素节点</td>
+        </tr>
+        <tr>
+            <td>body</td>
+            <td>指向文档的body元素节点</td>
+        </tr>
+        <tr>
+            <td>activeElement</td>
+            <td>指向文档中被激活（focused/active）的元素。</td>
+        </tr>
+        <tr>
+            <td>defaultView</td>
+            <td>指向当前文档的JavaScript顶层对象，即window对象</td>
+        </tr>
+        <tr>
+            <td>浏览器支持的模块信息</td>
+            <td>implementation</td>
+            <td>该属性指向一个对象，提供浏览器支持的模块信息</td>
+            <td><xmp class="js">document.implementation.hasFeature('MutationEvents','2.0')
+// true</xmp></td>
+        </tr>
+    </tbody>
+</table>
+<h3>2.2　特定元素的集合属性</h3>
+<table>
+    <thead>
+        <tr>
+            <th>属性</th>
+            <th>释义</th>
+            <th>eg</th>
+            <th>tips</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>document.all</td>
+            <td>文档中所有的元素，Firefox不支持该属性。</td>
+            <td rowspan="7"><xmp class="js">document.all
+document.forms
+document.images
+document.links
+document.scripts
+document.styleSheets
+</xmp></td>
+            <td rowspan="7">所有的元素集合都是动态的，<br/>原节点有任何变化，立刻会反映在这些集合中。</td>
+        </tr>
+        <tr>
+            <td>document.forms</td>
+            <td>所有的form元素。</td>
+        </tr>
+        <tr>
+            <td>document.images</td>
+            <td>所有的images元素。</td>
+        </tr>
+        <tr>
+            <td>document.links</td>
+            <td>所有的a元素。</td>
+        </tr>
+        <tr>
+            <td>document.scripts</td>
+            <td>所有的script元素。</td>
+        </tr>
+        <tr>
+            <td>document.styleSheets</td>
+            <td>所有的link或者style元素</td>
+        </tr>
+    </tbody>
+</table>
+<h3>2.3　document对象的方法</h3>
+<h4>（1）querySelector方法和getElementById方法</h4>
+<table>
+    <thead>
+        <tr>
+            <th>作用</th>
+            <th>方法</th>
+            <th>释义</th>
+            <th>参数</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="2">获取</td>
+            <td>querySelector()方法</td>
+            <td rowspan="2">用于获取一个Element节点</td>
+            <td>参数使用<span class="blue">CSS选择器</span>语法<br/>(如果有多个节点满足条件，<br/>则返回第一个匹配的节点。)<br/>null</td>
+            <td rowspan="2">
+                <xmp class="eg"><h1 id="til">What to buy</h1></xmp>
+                <xmp class="js">document.querySelector("h1");
+document.getElementById("til")；</xmp></td>
+        </tr>
+        <tr>
+            <td><span class="blue">getElementById()</span>方法</td>
+            <td>参数是HTML标签元素的<span class="blue">id属性</span></td>
+        </tr>
+    </tbody>
+</table>
+<h4>（2）querySelectorAll方法、getElementsByTagName方法和getElementsByClassName方法</h4>
+<table>
+    <thead>
+        <tr>
+            <th>作用</th>
+            <th>方法</th>
+            <th>释义</th>
+            <th>参数</th>
+            <th>不同1</th>
+            <th>不同2</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="3">获取</td>
+            <td>querySelectorAll()方法</td>
+            <td rowspan="3">返回一个NodeList对象<br/>(返回一组符合条件的节点对象)</td>
+            <td>参数使用<span class="blue">CSS选择器</span></td>
+            <td rowspan="2">参数是字符串“*”，<br/>返回文档中的所有HTML元素节点<br/>[]</td>
+            <td class="eg">NO</td>
+            <td rowspan="3">
+<xmp class="eg"><ul>
+    <li class="item">beans</li>
+    <li class="item">cheese</li>
+    <li class="item">Milk</li>
+</ul></xmp>
+                <xmp class="js">document.querySelectorAll('li');
+document.getElementsByTagName('li');
+document.getElementsByClassName('item');
+</xmp></td>
+        </tr>
+        <tr>
+            <td><span class="blue">getElementsByTagName()</span></td>
+            <td>参数是HTML<span class="blue">元素名</span</td>
+            <td rowspan="2">返回的是对象的指针，<br/>当对象发生变化时，<br/>返回的结果集会跟着变化</td>
+        </tr>
+        <tr>
+            <td>getElementsByClassName()</td>
+            <td>参数是HTML标签元素的<span class="blue">class属性</span></td>
+            <td>NO</td>
+        </tr>
+    </tbody>
+</table>
+<h4>（3）<span class="blue">getElementsByName()</span>方法</h4>
+<p>getElementsByName方法用于选择拥有name属性的HTML元素，比如form、img、frame、embed和object。</p>
+<h4>（4）createElement方法和createTextNode方法</h4>
+<table>
+    <thead>
+        <tr>
+            <th>作用</th>
+            <th>方法</th>
+            <th>释义</th>
+            <th>参数</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="2">创建</td>
+            <td><span class="blue">createElement()</span>方法</td>
+            <td>创建一种HTML元素</td>
+            <td>字符串：等同于元素节点的tagName属性</td>
+            <td rowspan="2">
+<xmp class="js">var elementNode = document.createElement("li");
+var textNode = document.createTextNode("eg!");
+var UL = document.getElementsByTagName("ul")[0];
+elementNode.appendChild(textNode);
+UL.appendChild(elementNode);
+</xmp>
+<xmp class="eg"><ul>
+    <li class="item">beans</li>
+    <li class="item">cheese</li>
+    <li class="item">Milk</li>
+    <li>eg!</li>
+</ul></xmp>
+                </td>
+        </tr>
+        <tr>
+            <td><span class="blue">createTextNode()</span>方法</td>
+            <td>创建文本</td>
+            <td>所要生成的文本节点的内容</td>
+            <td class="eg"></td>
+        </tr>
+    </tbody>
+</table>
+<h4>（5）hasFocus方法</h4>
+<p>hasFocus()方法返回一个布尔值，表示当前文档之中是否有元素被激活或获得焦点。</p>
+<p><span class="red fb">* </span>querySelector,querySelectorAll兼容性： IE8(含) 以上版本、 Firefox、 Chrome、Safari、Opera。</p>
+<h2>3. Element对象</h2>
+<h4>Element对象特有的属性：</h4>
+<table>
+    <thead>
+        <tr>
+            <th>属性</th>
+            <th>释义</th>
+            <th>eg</th>
+            <th>tips</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>innerHTML</td>
+            <td>读取或设置某个节点内的HTML代码</td>
+            <td rowspan="5">
+<xmp class="eg"><p id="myP" class="one two three"><span>Don't forget!</span></p></xmp>
+<xmp class="js">var P = document.getElementById("myP");
+P.innerHTML; //<span>Don't forget!</span> 
+P.outerHTML;
+//<p id="myP" class="one two three"><span>Don't forget!</span></p> 
+P.textContent; //Don't forget! 
+P.innerText; //Don't forget! 
+P.outerText; //Don't forget! 
+</xmp>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>outerHTML</td>
+            <td>读取或设置HTML代码时，会把节点本身包括在内</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>innertext</td>
+            <td>返回该节点的HTML标签名，<br/>与nodeName属性相同</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>outerText</td>
+            <td>返回一个数组，<br/>数组成员就是Element元素包含的每一个属性节点对象</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>textContent</td>
+            <td>读取或设置节点包含的文本内容</td>
+            <td>通常用于剥离HTML标签</td>
+        </tr>
+        <tr>
+            <td>firstElementChild</td>
+            <td>第一个子元素</td>
+            <td rowspan="5">
+<xmp class="eg"><ul id="myUL">
+    <li>beans</li>
+    <li>cheese</li>
+    <li>Milk</li>
+</ul>   
+</xmp>
+<xmp class="js">var UL = document.getElementById("myUL");
+var LI = document.getElementsByTagName("li");
+UL.firstElementChild; // <li>beans</li>
+UL.lastElementChild; //<li>Milk</li>
+LI[0].nextElementChild; //<li>cheese</li>
+LI[1].previousElementChild; //<li>beans</li>
+UL.childElementCount; //3
+</xmp>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>lastElementChild</td>
+            <td>最后一个子元素</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>nextElementSibling</td>
+            <td>同级下一个element节点</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>previousElementSibling</td>
+            <td>同级上一个element节点</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>childElementCount</td>
+            <td>元素子节点数目</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>tagName</td>
+            <td>返回该节点的HTML标签名，<br/>与nodeName属性相同</td>
+            <td>
+<xmp class="eg"><div id="myDIV">Some example text</div></xmp>
+<xmp class="js">var DIV = document.getElementById("myDIV");
+DIV.tagName; //DIV
+DIV.nodeName; //DIV
+</xmp>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>dataset</td>
+            <td></td>
+            <td>
+<xmp class="eg"></xmp>
+<xmp class="js"></xmp>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>attributes</td>
+            <td>返回一个数组，数组成员就是Element元素包含的每一个属性节点对象</td>
+            <td>
+<xmp class="eg"><input id="myInput" name="myInput" type="text" /></xmp>
+<xmp class="js">var INPUT = document.getElementById("myInput");
+var atts = INPUT.attributes;
+for (var i = 0; i < atts.length; i++) {
+    atts[i].nodeName+'：'+atts[i].nodeValue;
+};
+//id：myInput
+//name：myInput
+//type：text
+</xmp>
+            </td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+<h3>3.1　className属性和classList属性</h3>
+<table>
+    <thead>
+        <tr>
+            <th>element属性</th>
+            <th>释义</th>
+            <th>不同</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>className</td>
+            <td rowspan="2">返回HTML元素的class属性</td>
+            <td>返回一个字符串，每个class之间用空格分割</td>
+            <td rowspan="2">
+<xmp class="eg"><p id="myP" class="one two three">Don't forget!</p></xmp>
+<xmp class="js">var P = document.getElementById("myP");
+P.className; //one two three
+var classList = P.classList;
+for (var i = 0; i < classList.length; i++) {
+    classList[i];
+};
+//one
+//two
+//three
+</xmp>
+</td>
+        </tr>
+        <tr>
+            <td>classList</td>
+            <td>classList属性则返回一个类似数组的对象,<br/>每个class就是这个对象的一个成员</td>
+        </tr>
+    </tbody>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th>classList的方法</th>
+            <th>释义</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>add()</td>
+            <td>增加一个class</td>
+            <td rowspan="6">
+<xmp class="js">P.classList.add("newClass");
+//<p id="myP" class="one two three newClass">Don't forget!</p>
+P.classList.remove("one");
+//<p id="myP" class="two three newClass">Don't forget!</p>
+P.classList.contains("newClass");
+//true
+P.classList.item(0);
+//two
+P.classList.toString();
+//two three newClass   
+</xmp>
+            </td>
+        </tr>
+        <tr>
+            <td>remove()</td>
+            <td>移除一个class</td>
+        </tr>
+        <tr>
+            <td>contains()</td>
+            <td>检查该DOM元素是否包含某个class</td>
+        </tr>
+        <tr>
+            <td>toggle()</td>
+            <td>将某个class移入或移出该DOM元素</td>
+        </tr>
+        <tr>
+            <td>item()</td>
+            <td>返回列表中某个特定位置的class</td>
+        </tr>
+        <tr>
+            <td>toString()</td>
+            <td>将class的列表转为字符串</td>
+        </tr>
+    </tbody>
+</table>
+<h3>3.2　dataset属性</h3>
+<xmp class="eg"><div id="myDiv" data-id="myId"></div>
+</xmp>
+<xmp class="js">var id = document.getElementById("myDiv").dataset.id;
+document.getElementById("myDiv").dataset.id = "hello";
+</xmp>
+<h3>3.3　页面位置相关属性</h3>
+<table>
+    <thead>
+        <tr>
+            <th>分类</th>
+            <th>方法</th>
+            <th>释义</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="3">(1)相对位置</td>
+            <td>offsetParent</td>
+            <td></td>
+            <td rowspan="9">
+<xmp class="eg"><div id="myDIV">Some example text</div></xmp>
+<xmp class="js">var DIV = document.getElementById("myDIV");
+DIV.offsetParent; //body
+DIV.offsetLeft;
+DIV.offsetTop;
+IV.clientWidth;
+DIV.clientHeight;
+DIV.scrollWidth;
+DIV.scrollHeight;
+DIV.scrollLeft;
+DIV.scrollTop;
+</xmp>
+            </td>
+        </tr>
+        <tr>
+            <td>offsetLeft</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>offsetTop</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td rowspan="2">(2)元素高宽</td>
+            <td>clientWidth</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>clientHeight</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td rowspan="2">(3)滚动宽高</td>
+            <td>srcollWidth</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>scrollHeight</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td rowspan="2">(4)滚动位置</td>
+            <td>scrollLeft</td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>scrollTop</td>
+            <td></td>
+        </tr>
+    </tbody>
+</table>
+<h3>3.4　style属性</h3>
+<h3>3.5　Element对象的方法</h3>
+<table>
+    <thead>
+        <tr>
+            <th>分类/释义</th>
+            <th>方法</th>
+            <th>eg</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="4">（1）选择子元素的方法<br/><span class="f14">(只用于选择Element对象的子节点<br/>因此，可以采用链式写法来选择子节点)</span></td>
+            <td>querySelector()</td>
+            <td rowspan="4">
+<xmp class="eg"><ul id="myUL">
+    <li class="item">beans</li>
+    <li class="item">cheese</li>
+    <li class="item">Milk</li>
+</ul></xmp>
+<xmp class="js">var UL = document.getElementById("myUL");
+UL.getElementsByTagName("li");
+UL.querySelector("li");
+UL.querySelectorAll("li");
+UL.getElementsByClassName("item");
+</xmp>
+            </td>
+        </tr>
+        <tr>
+            <td>querySelectorAll()</td>
+        </tr>
+        <tr>
+            <td>getElementsByTagName()</td>
+        </tr>
+        <tr>
+            <td>getElemntByClassName()</td>
+        </tr>
+        <tr>
+            <td>(2)通过坐标选元素</td>
+            <td>elementFromPoint()</td>
+        </tr>
+        <tr>
+            <td rowspan="4">(3)HTML元素的属性相关方法</td>
+            <td>hasAttribute()</td>
+            <td rowspan="4">
+<xmp class="eg"><div id="myDIV" title="123">123</div></xmp>
+<xmp class="js">var DIV = document.getElementById("myDIV");
+DIV.hasAttribute("name"); //false
+DIV.getAttribute("title"); //123
+DIV.setAttribute("class","123");
+//<div id="myDIV" title="123" class="123">123</div>
+DIV.removeAttribute("title");
+//<div id="myDIV" class="123">123</div>
+</xmp>                
+            </td>
+        </tr>
+        <tr>
+            <td>getAttribute()</td>
+        </tr>
+        <tr>
+            <td>setAttribute()</td>
+        </tr>
+        <tr>
+            <td>removeAttribute()</td>
+        </tr>
+        <tr>
+            <td>(4)返回一个布尔值，<br/>表示Element对象是否符合某个CSS选择器</td>
+            <td>matchesSelector()<br/>
+                mozMatchesSelector() <br/>
+                webkitMatchesSelector()<br/>
+                oMatchesSelector()<br/>
+                msMatchesSelector()</td>
+            <td>
+<xmp class="js">document.querySelector('li').matchesSelector('li:first-child')
+//true
+</xmp>
+            </td>
+        </tr>
+        <tr>
+            <td>(5)用于将一个可滚动元素滚动到可见区域</td>
+            <td>scrollIntoView()</td>
+            <td>
+<xmp class="js">document.querySelectorAll('li').scrollIntoView()</xmp>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<h3>3.6　insertAdjacentHTML方法</h3>
+<p>insertAdjacentHTML方法可以将一段字符串，作为HTML或XML对象，插入DOM。</p>
+<p>insertAdjacentHTML方法接受两个参数，第一个是插入的位置，第二个是插入的节点字符串。关于插入的位置，可以取下面四个值。</p>
+<p>beforebegin：在指定元素之前插入，变成它的同级元素。<br/>
+afterbegin：在指定元素的开始标签之后插入，变成它的第一个子元素。<br/>
+beforeend：在指定元素的结束标签之前插入，变成它的最后一个子元素。<br/>
+afterend：在指定元素之后插入，变成它的同级元素。
+</p>
+<xmp class="eg">//before
+<div id="box1">
+    <p>Some example text</p>
+</div>
+<div id="box2">
+    <p>Some example text</p>
+</div>
+</xmp>
+<xmp class="js">//javascript
+var box2 = document.getElementById("box2");
+box2.insertAdjacentHTML('beforebegin', '<div><p>This gets inserted.</p></div>');
+</xmp>
+<xmp class="eg">//after
+<div id="box1">
+    <p>Some example text</p>
+</div>
+<div><p>This gets inserted.</p></div>
+<div id="box2">
+    <p>Some example text</p>
+</div>
+</xmp>
+<p><span class="red fb">* </span>insertAdjacentHTML方法比innerHTML方法效率高，因为它不是彻底置换现有的DOM结构。所有浏览器都支持这个方法，包括IE 6。</p>
+<h3>3.7　getBoundingClientRect方法</h3>
+<p>回一个记录了位置信息的对象，用于获取HTML元素相对于视口（viewport）左上角的位置以及本身的长度和宽度。</p>
+<xmp class="eg">var box = document.getElementById('box');
+var x1 = box.getBoundingClientRect().left;
+var y1 = box.getBoundingClientRect().top;
+var x2 = box.getBoundingClientRect().right;
+var y2 = box.getBoundingClientRect().bottom;
+var w = box.getBoundingClientRect().width;
+var h = box.getBoundingClientRect().height;
+</xmp>
+<h3>3.8　table元素</h3>
+<div class="clearfix">
+    <div class="fl pw49">
+        <p>方法：</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>方法</th>
+                    <th>释义</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>insertRow()</td>
+                    <td>在指定位置插入一个新行（tr）</td>
+                </tr>
+                <tr>
+                    <td>deleteRow()</td>
+                    <td>在指定位置删除一行（tr）</td>
+                </tr>
+                <tr>
+                    <td>insertCell()</td>
+                    <td>在指定位置插入一个单元格（td）</td>
+                </tr>
+                <tr>
+                    <td>deleteCell()</td>
+                    <td>在指定位置删除一个单元格（td）</td>
+                </tr>
+                <tr>
+                    <td>createCaption</td>
+                    <td>插入标题</td>
+                </tr>
+                <tr>
+                    <td>deleteCaption</td>
+                    <td>删除标题</td>
+                </tr>
+                <tr>
+                    <td>createTHead()</td>
+                    <td>插入表头</td>
+                </tr>
+                <tr>
+                    <td>deleteTHead()</td>
+                    <td>删除表头</td>
+                </tr>
+            </tbody>    
+        </table>
+    </div>
+    <div class="fr pw49">
+        <p>属性：</p>
+         <table>
+            <thead>
+                <tr>
+                    <th>属性</th>
+                    <th>释义</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>caption</td>
+                    <td>标题</td>
+                </tr>
+                <tr>
+                    <td>tHead</td>
+                    <td>表头</td>
+                </tr>
+                <tr>
+                    <td>tFoot</td>
+                    <td>表尾</td>
+                </tr>
+                <tr>
+                    <td>rows</td>
+                    <td>行元素对象，该属性只读</td>
+                </tr>
+                <tr>
+                    <td>rows.cell</td>
+                    <td>每一行的单元格对象，该属性只读</td>
+                </tr>
+                <tr>
+                    <td>tBodies</td>
+                    <td>表体，该属性只读</td>
+                </tr>
+            </tbody>    
+        </table>       
+    </div>
+</div>
+<h2>4. Text节点</h2>
+<p>文档中的文本对应Text节点，通常使用Element对象的firstChild、nextSibling等属性获取文本节点，或者使用document对象的createTextNode方法创造一个文本节点。</p>
+<xmp class="js">// 获取文本节点
+var textNode = document.querySelector('p').firstChild;
+// 创造文本节点
+var textNode = document.createTextNode('Hi');
+document.querySelector('div').appendChild(textNode);
+</xmp>
+<p><span class="red fb">* </span>由于空格也是一个字符，所以哪怕只有一个空格，也会形成文本节点。</p>
+<h3>4.1　文本节点的属性</h3>
+<p>除了继承的属性，文本节点自身主要的属性是data，它等同于nodeValue属性，用来返回文本节点的内容。</p>
+<xmp class="js">document.querySelector('p').firstChild.data
+document.querySelector('p').firstChild.nodeValue  
+</xmp>
+<h3>4.2　文本节点的方法</h3>
+         <table>
+            <thead>
+                <tr>
+                    <th>分类</th>
+                    <th>方法</th>
+                    <th>释义</th>
+                    <th>eg</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan="5">（1）文本编辑方法</td>
+                    <td>appendData()</td>
+                    <td>在文本尾部追加字符串</td>
+                    <td rowspan="5">
+<xmp class="eg"></xmp>
+<xmp class="js"></xmp>
+                    </td>
+                </tr>
+                <tr>
+                    <td>insertData()</td>
+                    <td>在文本中插入字符串</td>
+                </tr>
+                <tr>
+                    <td>deleteData()</td>
+                    <td>删除子字符串</td>
+                </tr>
+                <tr>
+                    <td>replaceData()</td>
+                    <td>替换文本</td>
+                </tr>
+                <tr>
+                    <td>subStringData()</td>
+                    <td>获取子字符串</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">（2）文本的分割与合并</td>
+                    <td>splitText()</td>
+                    <td>将文本节点一分为二</td>
+                    <td rowspan="2">
+<xmp class="eg"></xmp>
+<xmp class="js"></xmp>
+                    </td>
+                </tr>
+                <tr>
+                    <td>normalize()</td>
+                    <td>将毗邻的两个文本节点合并</td>
+                </tr>
+            </tbody>    
+        </table>
+<h2></h2> 
+<p>DocumentFragment节点代表一个完整的DOM树形结构，但是不属于当前文档，只存在于内存之中。操作DocumentFragment节点，要比直接操作文档快得多。它就像一个文档的片段，一般用于构建一个子结构，然后插入当前文档。</p>
+<p>document对象的createDocumentFragment方法可以创建DocumentFragment节点，然后再可以使用其他DOM方法，添加子节点。</p>
+<xmp class="js">var docFrag = document.createDocumentFragment();
+var li = document.createElement("li");
+li.textContent = "Hello World";
+docFrag.appendChild(li);
+
+document.queryselector('ul').appendChild(docFrag);</xmp>
+<p>上面代码创建了一个DocumentFragment节点，然后将一个li节点添加在它里面，最后将DocumentFragment节点移动到原文档。</p>
+<p>一旦DocumentFragment节点被添加进原文档，它自身就变成了空节点（textContent属性为空字符串）。如果想要保存DocumentFragment节点的内容，可以使用cloneNode方法。</p>
+<xmp class="js">document.queryselector('ul').(docFrag.cloneNode(true));
+</xmp>
+<h2>CSS操作</h2>
+<h2>常用的属性和方法的浏览器兼容性</h2> 
+<h2>DOM1，DOM2，DOM3</h2>  
+</body>
+</html>
